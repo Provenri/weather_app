@@ -1,5 +1,12 @@
 # Config with real keys (generated in CI for deployment)
 config.js
+frontend/config.js
+backend/.env
+
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
 
 # OS files
 .DS_Store
@@ -8,3 +15,7 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Logs
+*.log
+npm-debug.log*

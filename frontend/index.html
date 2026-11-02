@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🌤️ Weather App</h1>
+
+        <!-- Auth Section -->
+        <div class="card auth-section" id="authSection">
+            <div class="auth-forms" id="authForms">
+                <form class="auth-form active" id="signInForm">
+                    <h2>Sign In</h2>
+                    <input type="email" id="signInEmail" placeholder="Email address" autocomplete="email" required>
+                    <input type="password" id="signInPassword" placeholder="Password" autocomplete="current-password" required>
+                    <button type="submit" id="signInBtn">Sign In</button>
+                    <button type="button" class="auth-link" id="switchToSignUp">No account? Create one</button>
+                </form>
+                <form class="auth-form" id="signUpForm">
+                    <h2>Create Account</h2>
+                    <input type="text" id="signUpName" placeholder="Full name" autocomplete="name" required>
+                    <input type="email" id="signUpEmail" placeholder="Email address" autocomplete="email" required>
+                    <input type="password" id="signUpPassword" placeholder="Password (at least 8 characters)" autocomplete="new-password" minlength="8" required>
+                    <button type="submit" id="signUpBtn">Create Account</button>
+                    <button type="button" class="auth-link" id="switchToSignIn">Already have an account? Sign in</button>
+                </form>
+                <div class="auth-message" id="authMessage"></div>
+            </div>
+            <div class="signed-in-bar" id="signedInBar" style="display:none;">
+                <span>Signed in as</span>
+                <span class="signed-in-email" id="signedInEmail"></span>
+                <button type="button" class="sign-out-btn" id="signOutBtn">Sign Out</button>
+            </div>
+            <p class="auth-hint">Search weather as a guest, or sign in to save your search history privately.</p>
+        </div>
+
+        <!-- Search Section -->
+        <div class="card search-section">
+            <h2>Search Weather</h2>
+            <div class="input-group">
+                <input type="text" id="cityInput" placeholder="Enter city name (e.g., London, Tokyo, New York)" autocomplete="off">
+                <button id="searchBtn">Get Weather</button>
+            </div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Fetching weather...</p>
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+            
+            <!-- Current Weather Display -->
+            <div class="weather-display" id="weatherDisplay">
+                <div class="weather-main">
+                    <div class="weather-icon" id="weatherIcon">☀️</div>
+                    <div class="weather-info">
+                        <h3 id="cityName">City Name</h3>
+                        <div class="weather-temp" id="temperature">--°C</div>
+                        <div class="weather-desc" id="description">--</div>
+                    </div>
+                </div>
+                <div class="weather-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Humidity</div>
+                        <div class="detail-value" id="humidity">--%</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Wind Speed</div>
+                        <div class="detail-value" id="windSpeed">-- m/s</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Pressure</div>
+                        <div class="detail-value" id="pressure">-- hPa</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Feels Like</div>
+                        <div class="detail-value" id="feelsLike">--°C</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="card history-section">
+            <h2>
+                Search History
+                <span class="history-count" id="historyCount">0</span>
+            </h2>
+            <div class="history-list" id="historyList">
+                <div class="empty-history" id="emptyHistory">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p>No search history yet. Search for a city to see it here!</p>
+                </div>
+                <div class="history-guest-note" id="historyGuestNote">
+                    Sign in to save and view your search history.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Config is loaded via config.js (gitignored) -->
+    <script src="config.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

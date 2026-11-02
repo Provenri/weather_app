@@ -1,6 +1,33 @@
 # Weather App with Supabase
 
-A simple weather application that fetches weather data from OpenWeatherMap and stores private, per-user search history in Supabase with Row Level Security.
+A weather application with a **Node.js/Express backend** and **vanilla JS frontend** that fetches weather data from OpenWeatherMap and stores private, per-user search history in Supabase with Row Level Security.
+
+## Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌──────────────────┐
+│   Frontend      │────▶│    Backend      │────▶│   OpenWeatherMap │
+│   (Vanilla JS)  │     │  (Express API)  │     │      API         │
+│   Port 5173     │     │   Port 3001     │     │                  │
+└─────────────────┘     └────────┬────────┘     └──────────────────┘
+                                 │
+                                 ▼
+                        ┌─────────────────┐
+                        │    Supabase     │
+                        │  (PostgreSQL +  │
+                        │   Auth + RLS)   │
+                        └─────────────────┘
+```
+
+### Backend Responsibilities
+- **Weather API Proxy** (`/api/weather`) - Hides OpenWeatherMap API key
+- **History CRUD** (`/api/history`) - Save/load user search history using Supabase service role
+- **Auth Verification** - Validates Supabase JWT tokens for protected routes
+
+### Frontend Responsibilities
+- **UI/UX** - All user interface logic
+- **Authentication** - Supabase Auth (signup, signin, signout) using anon key
+- **API Client** - Calls backend endpoints with user's access token
 
 ## Features
 
@@ -8,7 +35,7 @@ A simple weather application that fetches weather data from OpenWeatherMap and s
 - Display current temperature, humidity, wind speed, pressure, and "feels like" temperature
 - Sign up and sign in with email and password (Supabase Auth)
 - Search history stored in Supabase database, private per user
-- Guest access: search weather without an account (history is only saved for signed-in users)
+- Guest access: search weather without an account (history only saved for signed-in users)
 - Row Level Security (RLS) enabled on Supabase table
 - Responsive design works on mobile and desktop
 
@@ -19,47 +46,130 @@ A simple weather application that fetches weather data from OpenWeatherMap and s
 1. Create a new project at [supabase.com](https://supabase.com)
 2. Go to the SQL Editor in your Supabase dashboard
 3. Copy and run the contents of `supabase_setup.sql`
-4. Enable the email provider: Authentication → Providers → Email. Whether new accounts must confirm their email before signing in is controlled by the "Confirm email" setting on that page.
-5. Get your project URL and anon key from Settings → API
+4. Enable the email provider: Authentication → Providers → Email
+5. Get your project URL and keys from Settings → API:
+   - **Project URL** → `SUPABASE_URL`
+   - **Anon/Public Key** → `SUPABASE_ANON_KEY` (for frontend)
+   - **Service Role Key** → `SUPABASE_SERVICE_ROLE_KEY` (for backend - keep secret!)
 
 ### 2. OpenWeatherMap API Key
 
 1. Sign up at [openweathermap.org](https://openweathermap.org/api)
-2. Get your free API key
+2. Get your free API key → `OPENWEATHER_API_KEY`
 
 ### 3. Configure the Application
 
-**Local:** copy `config.example.js` to `config.js` (gitignored) and fill in your keys:
+#### Backend
+```bash
+cd backend
+cp .env.example .env
+# Edit .env with your keys
+```
 
+Required backend environment variables:
+```env
+PORT=3001
+NODE_ENV=development
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+OPENWEATHER_API_KEY=your-openweather-api-key
+FRONTEND_URL=http://localhost:5173
+```
+
+#### Frontend
+```bash
+cd frontend
+cp config.example.js config.js
+# Edit config.js with your keys
+```
+
+Required frontend config:
 ```javascript
 window.APP_CONFIG = {
+    API_BASE_URL: 'http://localhost:3001/api',
     SUPABASE_URL: 'https://your-project.supabase.co',
-    SUPABASE_ANON_KEY: 'your-anon-key',
-    OPENWEATHER_API_KEY: 'your-openweather-api-key'
+    SUPABASE_ANON_KEY: 'your-anon-key'
 };
 ```
 
-**GitHub Pages:** in the repo go to Settings → Pages and set Source to **GitHub Actions**. Then add three repository secrets under Settings → Secrets and variables → Actions: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `OPENWEATHER_API_KEY`. The workflow in `.github/workflows/deploy.yml` generates `config.js` from them on every push to `main`. Note that the keys are still visible to anyone using the deployed page; restrict them accordingly.
+### 4. Install Dependencies
 
-### 4. Run the Application
-
-Since this is a client-side only application, you can:
-
-**Option A: Open directly in browser**
-- Double-click `index.html` to open in your default browser
-
-**Option B: Serve with a local server (recommended)**
 ```bash
-# Using Python
-python -m http.server 8000
-
-# Using Node.js (if you have npx)
-npx serve
-
-# Using PHP
-php -S localhost:8000
+# From root directory
+npm run install:all
 ```
-Then open `http://localhost:8000` in your browser.
+
+Or manually:
+```bash
+npm install           # Root (for concurrently, serve)
+cd backend && npm install
+cd ../frontend && npm install
+```
+
+### 5. Run the Application
+
+#### Development (both frontend and backend)
+```bash
+npm run dev
+```
+
+This starts:
+- Backend on http://localhost:3001
+- Frontend on http://localhost:5173
+
+#### Production-like (separate terminals)
+```bash
+# Terminal 1 - Backend
+npm run start:backend
+
+# Terminal 2 - Frontend
+npm run start:frontend
+```
+
+## Project Structure
+
+```
+weather-app/
+├── backend/
+│   ├── package.json
+│   ├── server.js              # Express app entry point
+│   ├── .env.example           # Backend env template
+│   ├── routes/
+│   │   ├── weather.js         # GET /api/weather?city=X
+│   │   └── history.js         # GET/POST /api/history (auth required)
+│   ├── services/
+│   │   ├── openweather.js     # OpenWeatherMap API client
+│   │   └── supabase.js        # Supabase service role client
+│   └── middleware/
+│       └── auth.js            # JWT verification middleware
+├── frontend/
+│   ├── index.html             # Main HTML
+│   ├── styles.css             # All styles
+│   ├── app.js                 # Main entry point
+│   ├── config.example.js      # Frontend config template
+│   ├── auth.js                # Supabase Auth management
+│   ├── weather.js             # Weather search & display
+│   ├── history.js             # History loading & display
+│   └── ui.js                  # DOM manipulation utilities
+├── supabase_setup.sql         # Database schema + RLS policies
+├── package.json               # Root scripts
+└── README.md
+```
+
+## API Endpoints
+
+### Weather
+```
+GET /api/weather?city=London
+```
+Returns OpenWeatherMap response (proxied, API key hidden).
+
+### History (requires Authorization: Bearer <token>)
+```
+GET /api/history?limit=50
+POST /api/history
+  Body: { "weatherData": { ...OpenWeatherMap response... } }
+```
 
 ## Database Schema
 
@@ -75,28 +185,64 @@ The `weather_history` table stores:
 - `weather_description` - Detailed weather description
 - `weather_icon` - OpenWeatherMap icon code
 - `timestamp` - When the search was made
-- `user_id` - The Supabase auth user ID of the owner (NULL for legacy rows created before multi-user support)
+- `user_id` - The Supabase auth user ID of the owner
 
 ## Authentication
 
-- Users sign up and sign in with email and password via [Supabase Auth](https://supabase.com/docs/guides/auth)
-- Sessions persist across page reloads via `localStorage` (Supabase's default session storage)
-- Guests can use the app and search weather, but history is only saved and shown for signed-in users
+- Users sign up and sign in with email and password via Supabase Auth
+- Frontend uses **anon key** for auth operations
+- Backend uses **service role key** to bypass RLS for history operations
+- JWT tokens are sent to backend via `Authorization: Bearer <token>` header
+- Sessions persist across page reloads via localStorage (Supabase's default)
 
 ## Row Level Security
 
-RLS is enabled on `weather_history` with two policies (for the `authenticated` role only):
-- **SELECT**: a user can read only their own rows (`auth.uid() = user_id`)
-- **INSERT**: a user can only insert rows for their own user ID (`auth.uid() = user_id`)
+RLS is enabled on `weather_history` with policies for the `authenticated` role:
+- **SELECT**: Users can read only their own rows (`auth.uid() = user_id`)
+- **INSERT**: Users can only insert rows for their own user ID (`auth.uid() = user_id`)
 
-Guests (the `anon` role) have no access to the table at all. There are no UPDATE or DELETE policies, so existing rows can't be modified or removed through the API. Column length checks limit what can be inserted.
+The backend uses the service role key which bypasses RLS, but enforces user isolation by explicitly filtering by `user_id` in all queries.
+
+## Deployment
+
+### GitHub Pages (Frontend) + Render/Railway/Fly.io (Backend)
+
+1. **Backend**: Deploy to any Node.js hosting (Render, Railway, Fly.io, etc.)
+   - Set environment variables in hosting platform
+   - Update `FRONTEND_URL` to your deployed frontend URL
+
+2. **Frontend**: Deploy to GitHub Pages
+   - Update `config.js` with production backend URL
+   - Or use GitHub Actions to inject config at build time
+
+### Environment Variables for Production
+
+**Backend:**
+```env
+NODE_ENV=production
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+OPENWEATHER_API_KEY=...
+FRONTEND_URL=https://your-frontend-domain.com
+```
+
+**Frontend (config.js):**
+```javascript
+window.APP_CONFIG = {
+    API_BASE_URL: 'https://your-backend-domain.com/api',
+    SUPABASE_URL: '...',
+    SUPABASE_ANON_KEY: '...'
+};
+```
 
 ## Tech Stack
 
 - **Frontend**: Vanilla HTML, CSS, JavaScript (ES Modules)
+- **Backend**: Node.js, Express
 - **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth
 - **Weather API**: OpenWeatherMap
-- **No backend required** - runs entirely in the browser
+- **Dev Tools**: concurrently, serve
 
 ## Browser Support
 
