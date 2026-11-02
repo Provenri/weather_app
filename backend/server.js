@@ -9,8 +9,13 @@ const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Middleware
+const CODESPACES_ORIGIN = /^https:\/\/[a-z0-9-]+-5173\.app\.github\.dev$/;
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: (origin, callback) => {
+    const allowed = !origin || origin === FRONTEND_URL ||
+      (process.env.CODESPACES === 'true' && CODESPACES_ORIGIN.test(origin));
+    callback(null, allowed ? origin || true : false);
+  },
   credentials: true
 }));
 app.use(express.json());
