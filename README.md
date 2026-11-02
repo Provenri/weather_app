@@ -1,0 +1,98 @@
+# Weather App with Supabase
+
+A simple weather application that fetches weather data from OpenWeatherMap and stores search history in Supabase with Row Level Security.
+
+## Features
+
+- Search weather by city name
+- Display current temperature, humidity, wind speed, pressure, and "feels like" temperature
+- Search history stored in Supabase database
+- Row Level Security (RLS) enabled on Supabase table
+- Responsive design works on mobile and desktop
+
+## Setup Instructions
+
+### 1. Supabase Setup
+
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to the SQL Editor in your Supabase dashboard
+3. Copy and run the contents of `supabase_setup.sql`
+4. Get your project URL and anon key from Settings → API
+
+### 2. OpenWeatherMap API Key
+
+1. Sign up at [openweathermap.org](https://openweathermap.org/api)
+2. Get your free API key
+
+### 3. Configure the Application
+
+Open `index.html` and replace the following constants at the top of the script section:
+
+```javascript
+const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_ANON_KEY = 'your-anon-key';
+const OPENWEATHER_API_KEY = 'your-openweather-api-key';
+```
+
+### 4. Run the Application
+
+Since this is a client-side only application, you can:
+
+**Option A: Open directly in browser**
+- Double-click `index.html` to open in your default browser
+
+**Option B: Serve with a local server (recommended)**
+```bash
+# Using Python
+python -m http.server 8000
+
+# Using Node.js (if you have npx)
+npx serve
+
+# Using PHP
+php -S localhost:8000
+```
+Then open `http://localhost:8000` in your browser.
+
+## Database Schema
+
+The `weather_history` table stores:
+- `city_name` - Name of the city
+- `country_code` - ISO country code
+- `temperature` - Current temperature in Celsius
+- `feels_like` - "Feels like" temperature
+- `humidity` - Humidity percentage
+- `pressure` - Atmospheric pressure in hPa
+- `wind_speed` - Wind speed in m/s
+- `weather_main` - Main weather condition (Clear, Clouds, Rain, etc.)
+- `weather_description` - Detailed weather description
+- `weather_icon` - OpenWeatherMap icon code
+- `timestamp` - When the search was made
+- `user_id` - Reference to auth.users (for future auth integration)
+
+## Row Level Security
+
+The table has RLS enabled with policies for:
+- **Anonymous users** (using anon key): Can read and insert weather history
+- **Authenticated users**: Can read and insert weather history
+
+This allows the app to work without user authentication while still securing the data.
+
+## Tech Stack
+
+- **Frontend**: Vanilla HTML, CSS, JavaScript (ES Modules)
+- **Database**: Supabase (PostgreSQL)
+- **Weather API**: OpenWeatherMap
+- **No backend required** - runs entirely in the browser
+
+## Browser Support
+
+Modern browsers with ES Module support:
+- Chrome 61+
+- Firefox 60+
+- Safari 11+
+- Edge 79+
+
+## License
+
+MIT
