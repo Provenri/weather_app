@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import ws from 'ws';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
@@ -8,7 +9,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Create a client with anon key for JWT verification
-const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+  realtime: { transport: ws }
+});
 
 /**
  * Middleware to verify Supabase JWT token

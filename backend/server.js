@@ -1,10 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import weatherRoutes from './routes/weather.js';
 import historyRoutes from './routes/history.js';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;

@@ -71,6 +71,7 @@ Required backend environment variables:
 PORT=3001
 NODE_ENV=development
 SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 OPENWEATHER_API_KEY=your-openweather-api-key
 FRONTEND_URL=http://localhost:5173
