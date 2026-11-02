@@ -1,3 +1,6 @@
+# Config with real keys (generated in CI for deployment)
+config.js
+
 # OS files
 .DS_Store
 Thumbs.db

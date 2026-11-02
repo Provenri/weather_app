@@ -26,13 +26,17 @@ A simple weather application that fetches weather data from OpenWeatherMap and s
 
 ### 3. Configure the Application
 
-Open `index.html` and replace the following constants at the top of the script section:
+**Local:** copy `config.example.js` to `config.js` (gitignored) and fill in your keys:
 
 ```javascript
-const SUPABASE_URL = 'https://your-project.supabase.co';
-const SUPABASE_ANON_KEY = 'your-anon-key';
-const OPENWEATHER_API_KEY = 'your-openweather-api-key';
+window.APP_CONFIG = {
+    SUPABASE_URL: 'https://your-project.supabase.co',
+    SUPABASE_ANON_KEY: 'your-anon-key',
+    OPENWEATHER_API_KEY: 'your-openweather-api-key'
+};
 ```
+
+**GitHub Pages:** in the repo go to Settings → Pages and set Source to **GitHub Actions**. Then add three repository secrets under Settings → Secrets and variables → Actions: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `OPENWEATHER_API_KEY`. The workflow in `.github/workflows/deploy.yml` generates `config.js` from them on every push to `main`. Note that the keys are still visible to anyone using the deployed page; restrict them accordingly.
 
 ### 4. Run the Application
 
