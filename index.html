@@ -305,6 +305,153 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Auth Section */
+        .auth-section {
+            margin-bottom: 20px;
+        }
+
+        .auth-forms {
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .auth-form {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .auth-form.active {
+            display: flex;
+        }
+
+        .auth-form input {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .auth-form button[type="submit"] {
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .auth-form button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .auth-form button[type="submit"]:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-link {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: underline;
+            padding: 4px;
+        }
+
+        .auth-link:hover {
+            color: #764ba2;
+        }
+
+        .auth-message {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .auth-message.visible {
+            display: block;
+        }
+
+        .auth-message.error {
+            background: #fde8e8;
+            color: #c0392b;
+        }
+
+        .auth-message.success {
+            background: #e8f8f0;
+            color: #1e8449;
+        }
+
+        .signed-in-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .signed-in-email {
+            font-weight: 600;
+            color: #343a40;
+            max-width: 320px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sign-out-btn {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            color: #495057;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        .sign-out-btn:hover {
+            background: #fde8e8;
+            color: #c0392b;
+            border-color: #f5c2c2;
+        }
+
+        .auth-hint {
+            font-size: 13px;
+            color: #6c757d;
+            text-align: center;
+            margin-top: 14px;
+        }
+
+        .history-guest-note {
+            display: none;
+            padding: 12px 15px;
+            background: #eef1ff;
+            color: #4a4f7a;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .history-guest-note.visible {
+            display: block;
+        }
+
         @media (max-width: 600px) {
             .input-group {
                 flex-direction: column;
@@ -320,7 +467,34 @@
     <div class="container">
         <h1>🌤️ Weather App</h1>
 
-        <!-- Search Section -->
+                <!-- Auth Section -->
+                <div class="card auth-section" id="authSection">
+                    <div class="auth-forms" id="authForms">
+                        <form class="auth-form active" id="signInForm">
+                            <h2>Sign In</h2>
+                            <input type="email" id="signInEmail" placeholder="Email address" autocomplete="email" required>
+                            <input type="password" id="signInPassword" placeholder="Password" autocomplete="current-password" required>
+                            <button type="submit" id="signInBtn">Sign In</button>
+                            <button type="button" class="auth-link" id="switchToSignUp">No account? Create one</button>
+                        </form>
+                        <form class="auth-form" id="signUpForm">
+                            <h2>Create Account</h2>
+                            <input type="email" id="signUpEmail" placeholder="Email address" autocomplete="email" required>
+                            <input type="password" id="signUpPassword" placeholder="Password (at least 8 characters)" autocomplete="new-password" minlength="8" required>
+                            <button type="submit" id="signUpBtn">Create Account</button>
+                            <button type="button" class="auth-link" id="switchToSignIn">Already have an account? Sign in</button>
+                        </form>
+                        <div class="auth-message" id="authMessage"></div>
+                    </div>
+                    <div class="signed-in-bar" id="signedInBar" style="display:none;">
+                        <span>Signed in as</span>
+                        <span class="signed-in-email" id="signedInEmail"></span>
+                        <button type="button" class="sign-out-btn" id="signOutBtn">Sign Out</button>
+                    </div>
+                    <p class="auth-hint">Search weather as a guest, or sign in to save your search history privately.</p>
+                </div>
+
+                <!-- Search Section -->
         <div class="card search-section">
             <h2>Search Weather</h2>
             <div class="input-group">
@@ -377,9 +551,12 @@
                     </svg>
                     <p>No search history yet. Search for a city to see it here!</p>
                 </div>
-            </div>
-        </div>
-    </div>
+                                    <div class="history-guest-note" id="historyGuestNote">
+                                        Sign in to save and view your search history.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
     <!-- config.js is gitignored locally and generated by the GitHub Actions deploy workflow -->
     <script src="config.js"></script>
@@ -390,6 +567,9 @@
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+                // Current auth session (null when signed out / browsing as a guest)
+                let currentSession = null;
+
         // DOM Elements
         const cityInput = document.getElementById('cityInput');
         const searchBtn = document.getElementById('searchBtn');
@@ -399,6 +579,24 @@
         const historyList = document.getElementById('historyList');
         const emptyHistory = document.getElementById('emptyHistory');
         const historyCount = document.getElementById('historyCount');
+                const historyGuestNote = document.getElementById('historyGuestNote');
+
+                // Auth elements
+                const authForms = document.getElementById('authForms');
+                const signInForm = document.getElementById('signInForm');
+                const signInEmail = document.getElementById('signInEmail');
+                const signInPassword = document.getElementById('signInPassword');
+                const signInBtn = document.getElementById('signInBtn');
+                const signUpForm = document.getElementById('signUpForm');
+                const signUpEmail = document.getElementById('signUpEmail');
+                const signUpPassword = document.getElementById('signUpPassword');
+                const signUpBtn = document.getElementById('signUpBtn');
+                const switchToSignIn = document.getElementById('switchToSignIn');
+                const switchToSignUp = document.getElementById('switchToSignUp');
+                const authMessage = document.getElementById('authMessage');
+                const signedInBar = document.getElementById('signedInBar');
+                const signedInEmail = document.getElementById('signedInEmail');
+                const signOutBtn = document.getElementById('signOutBtn');
 
         // Weather display elements
         const weatherIcon = document.getElementById('weatherIcon');
@@ -447,6 +645,85 @@
             errorMessage.classList.remove('visible');
         }
 
+                // Show a message in the auth section
+                function setAuthMessage(text, type) {
+                    authMessage.textContent = text;
+                    authMessage.className = `auth-message visible ${type}`.trim();
+                }
+
+                function clearAuthMessage() {
+                    authMessage.textContent = '';
+                    authMessage.className = 'auth-message';
+                }
+
+                // Show the sign in/up forms or the signed-in bar
+                function updateAuthUI() {
+                    const signedIn = Boolean(currentSession && currentSession.user);
+                    authForms.style.display = signedIn ? 'none' : 'block';
+                    signedInBar.style.display = signedIn ? 'flex' : 'none';
+                    if (signedIn) {
+                        signedInEmail.textContent = currentSession.user.email;
+                    }
+                }
+
+                async function handleSignIn(event) {
+                    event.preventDefault();
+                    const email = signInEmail.value.trim();
+                    const password = signInPassword.value;
+                    if (!email || !password) {
+                        setAuthMessage('Please enter your email and password.', 'error');
+                        return;
+                    }
+                    signInBtn.disabled = true;
+                    clearAuthMessage();
+                    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                    signInBtn.disabled = false;
+                    if (error) {
+                        setAuthMessage(error.message, 'error');
+                        return;
+                    }
+                    signInForm.reset();
+                    // The rest is handled by onAuthStateChange
+                }
+
+                async function handleSignUp(event) {
+                    event.preventDefault();
+                    const email = signUpEmail.value.trim();
+                    const password = signUpPassword.value;
+                    if (!email || !password) {
+                        setAuthMessage('Please enter an email and a password (at least 8 characters).', 'error');
+                        return;
+                    }
+                    signUpBtn.disabled = true;
+                    clearAuthMessage();
+                    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                    signUpBtn.disabled = false;
+                    if (error) {
+                        setAuthMessage(error.message, 'error');
+                        return;
+                    }
+                    if (data.session) {
+                        // Signed in immediately (email confirmation disabled)
+                        signUpForm.reset();
+                    } else {
+                        setAuthMessage('Account created! Check your email to confirm your account, then sign in.', 'success');
+                        switchToSignIn.click();
+                    }
+                }
+
+                async function handleSignOut() {
+                    const { error } = await supabaseClient.auth.signOut();
+                    if (error) {
+                        console.error('Sign out error:', error);
+                    }
+                }
+
+                // Reload and render the history for the current session
+                async function refreshHistory() {
+                    const history = await loadHistory();
+                    renderHistory(history);
+                }
+
         // Format timestamp
         function formatTime(timestamp) {
             const date = new Date(timestamp * 1000);
@@ -484,12 +761,17 @@
             return response.json();
         }
 
-        // Save weather to Supabase
+        // Save weather to Supabase (signed-in users only; guest searches are not saved)
         async function saveWeather(weatherData) {
-            const { data, error } = await supabaseClient
-                .from('weather_history')
-                .insert({
-                    city_name: weatherData.name,
+                    if (!currentSession) {
+                        return null;
+                    }
+
+                    const { data, error } = await supabaseClient
+                        .from('weather_history')
+                        .insert({
+                            user_id: currentSession.user.id,
+                            city_name: weatherData.name,
                     country_code: weatherData.sys.country,
                     temperature: weatherData.main.temp,
                     feels_like: weatherData.main.feels_like,
@@ -512,13 +794,18 @@
             return data;
         }
 
-        // Load history from Supabase
+        // Load history from Supabase (guests see nothing; each user sees only their own rows)
         async function loadHistory() {
-            const { data, error } = await supabaseClient
-                .from('weather_history')
-                .select('*')
-                .order('timestamp', { ascending: false })
-                .limit(50);
+                    if (!currentSession) {
+                        return [];
+                    }
+
+                    const { data, error } = await supabaseClient
+                        .from('weather_history')
+                        .select('*')
+                        .eq('user_id', currentSession.user.id)
+                        .order('timestamp', { ascending: false })
+                        .limit(50);
 
             if (error) {
                 console.error('Supabase error:', error);
@@ -530,9 +817,20 @@
 
         // Render history
         function renderHistory(history) {
-            historyCount.textContent = history.length;
-            
-            if (history.length === 0) {
+                    const isGuest = !currentSession;
+                    historyCount.textContent = isGuest ? 0 : history.length;
+
+                    if (isGuest) {
+                        emptyHistory.style.display = 'none';
+                        historyList.innerHTML = '';
+                        historyList.appendChild(historyGuestNote);
+                        historyGuestNote.classList.add('visible');
+                        return;
+                    }
+
+                    historyGuestNote.classList.remove('visible');
+
+                    if (history.length === 0) {
                 emptyHistory.style.display = 'block';
                 historyList.innerHTML = '';
                 historyList.appendChild(emptyHistory);
@@ -601,22 +899,48 @@
 
         // Initialize
         async function init() {
-            try {
-                const history = await loadHistory();
-                renderHistory(history);
-            } catch (error) {
-                console.error('Failed to load history:', error);
-            }
-        }
+                    // Restore any existing session and react to sign in / sign out / token refresh
+                    const { data } = await supabaseClient.auth.getSession();
+                    currentSession = data ? data.session : null;
+                    updateAuthUI();
 
-        // Event listeners
-        searchBtn.addEventListener('click', handleSearch);
-        cityInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSearch();
-        });
+                    supabaseClient.auth.onAuthStateChange((_event, session) => {
+                        currentSession = session;
+                        updateAuthUI();
+                        refreshHistory().catch((error) => {
+                            console.error('Failed to refresh history:', error);
+                        });
+                    });
 
-        // Start
-        init();
+                    try {
+                        await refreshHistory();
+                    } catch (error) {
+                        console.error('Failed to load history:', error);
+                    }
+                }
+
+                // Event listeners
+                searchBtn.addEventListener('click', handleSearch);
+                cityInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleSearch();
+                });
+
+                signInForm.addEventListener('submit', handleSignIn);
+                signUpForm.addEventListener('submit', handleSignUp);
+                signOutBtn.addEventListener('click', handleSignOut);
+                switchToSignIn.addEventListener('click', () => {
+                    clearAuthMessage();
+                    signInForm.classList.add('active');
+                    signUpForm.classList.remove('active');
+                });
+                switchToSignUp.addEventListener('click', () => {
+                    clearAuthMessage();
+                    signUpForm.classList.add('active');
+                    signInForm.classList.remove('active');
+                });
+
+                // Start
+                init();
     </script>
 
     <!-- Supabase CDN -->

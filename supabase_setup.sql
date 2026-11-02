@@ -12,27 +12,40 @@ CREATE TABLE IF NOT EXISTS public.weather_history (
     weather_main TEXT NOT NULL CHECK (char_length(weather_main) <= 100),
     weather_description TEXT NOT NULL CHECK (char_length(weather_description) <= 200),
     weather_icon TEXT NOT NULL CHECK (char_length(weather_icon) <= 10),
-    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+        timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE
+    );
 
-CREATE INDEX IF NOT EXISTS idx_weather_history_timestamp ON public.weather_history (timestamp DESC);
+    -- For databases created before the app had login support, add the column
+    -- if the table already existed.
+    ALTER TABLE public.weather_history
+        ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
 
--- Row Level Security: with RLS on and no matching policy, access is denied.
-ALTER TABLE public.weather_history ENABLE ROW LEVEL SECURITY;
+    CREATE INDEX IF NOT EXISTS idx_weather_history_timestamp ON public.weather_history (timestamp DESC);
+    CREATE INDEX IF NOT EXISTS idx_weather_history_user_id ON public.weather_history (user_id);
 
--- The app has no login, so visitors use the anon role. They may read all rows
--- (the shared city list) and add new rows, but never update or delete.
-DROP POLICY IF EXISTS "Anyone can read weather history" ON public.weather_history;
-DROP POLICY IF EXISTS "Anyone can insert weather history" ON public.weather_history;
+    -- Row Level Security: with RLS on and no matching policy, access is denied.
+    ALTER TABLE public.weather_history ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Anyone can read weather history"
-    ON public.weather_history
-    FOR SELECT
-    TO anon, authenticated
-    USING (true);
+    -- History is private per user. Signed-in (authenticated) users can read and
+    -- insert only rows where user_id matches their own account. Guests (the anon
+    -- role) have no access to history at all.
+    DROP POLICY IF EXISTS "Anyone can read weather history" ON public.weather_history;
+    DROP POLICY IF EXISTS "Anyone can insert weather history" ON public.weather_history;
+    DROP POLICY IF EXISTS "Users can read their own weather history" ON public.weather_history;
+    DROP POLICY IF EXISTS "Users can insert their own weather history" ON public.weather_history;
 
-CREATE POLICY "Anyone can insert weather history"
-    ON public.weather_history
-    FOR INSERT
-    TO anon, authenticated
-    WITH CHECK (true);
+    CREATE POLICY "Users can read their own weather history"
+        ON public.weather_history
+        FOR SELECT
+        TO authenticated
+        USING (auth.uid() = user_id);
+
+    CREATE POLICY "Users can insert their own weather history"
+        ON public.weather_history
+        FOR INSERT
+        TO authenticated
+        WITH CHECK (auth.uid() = user_id);
+
+    -- Note: rows created before login support existed have user_id = NULL and are
+    -- therefore invisible to everyone, including their original creator.
