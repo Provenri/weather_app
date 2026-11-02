@@ -72,15 +72,14 @@ The `weather_history` table stores:
 - `weather_description` - Detailed weather description
 - `weather_icon` - OpenWeatherMap icon code
 - `timestamp` - When the search was made
-- `user_id` - Reference to auth.users (for future auth integration)
 
 ## Row Level Security
 
-The table has RLS enabled with policies for:
-- **Anonymous users** (using anon key): Can read and insert weather history
-- **Authenticated users**: Can read and insert weather history
+RLS is enabled on `weather_history` with two policies (for the `anon` and `authenticated` roles):
+- **SELECT**: anyone can read all rows (this feeds the shared city list)
+- **INSERT**: anyone can add rows
 
-This allows the app to work without user authentication while still securing the data.
+There are no UPDATE or DELETE policies, so existing rows can't be modified or removed through the API. Column length checks limit what can be inserted.
 
 ## Tech Stack
 
